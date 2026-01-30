@@ -277,6 +277,11 @@ export const paymentService = {
     return response.data;
   },
 
+  async createGuestPreference(pedidoId) {
+    const response = await api.post('/pagos/crear-preferencia-invitado', { pedidoId });
+    return response.data;
+  },
+
   async getPaymentStatus(pedidoId) {
     const response = await api.get(`/pagos/pedido/${pedidoId}`);
     return response.data;

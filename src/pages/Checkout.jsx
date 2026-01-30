@@ -164,8 +164,13 @@ export default function Checkout() {
       const pedidoId = ordenResponse.data.id;
       toast.success('Orden creada exitosamente');
 
-      // Crear preferencia de Mercado Pago
-      const mpResponse = await paymentService.createPreference({ pedidoId });
+      // Crear preferencia de Mercado Pago según el tipo de usuario
+      let mpResponse;
+      if (isAuthenticated) {
+        mpResponse = await paymentService.createPreference({ pedidoId });
+      } else {
+        mpResponse = await paymentService.createGuestPreference(pedidoId);
+      }
 
       // Redirigir a Mercado Pago
       if (mpResponse.data.initPoint) {
