@@ -1,0 +1,85 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@100..900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-primary: #000000;
+  --color-primary-light: #1A1A1A;
+  --color-secondary: #FFFFFF;
+  --color-accent: #10B981; /* Changed from Neon Green to Emerald */
+  --color-accent-alt: #FF3333;
+  --color-accent-cool: #00D9FF;
+  
+  --color-surface: #FFFFFF;
+  --color-border: #E0E0E0;
+  --color-border-bold: #000000;
+  
+  /* Fonts */
+  --font-heading: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Animations */
+  --animate-blob: blob 7s infinite;
+  --animate-pulse-slow: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-marquee: marquee 25s linear infinite;
+
+  @keyframes blob {
+    0% { transform: translate(0px, 0px) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0px, 0px) scale(1); }
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes overlayShow {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes contentShow {
+    from { opacity: 0; transform: translate(-50%, -48%) scale(0.96); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  --animate-overlayShow: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-contentShow: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Custom Utilities / Base Styles */
+@layer base {
+  body {
+    @apply font-body bg-[#F5F5F5] text-primary antialiased;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading uppercase tracking-tight;
+  }
+  
+  .text-stroke-white {
+    -webkit-text-stroke: 1px white;
+    color: transparent;
+  }
+}
+
+/* Component Classes */
+@layer components {
+  .btn-street {
+    @apply bg-black text-white px-8 py-3 text-sm uppercase tracking-wider font-bold transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer flex items-center justify-center gap-2;
+  }
+  
+  .btn-street:hover {
+    box-shadow: 4px 4px 0px 0px var(--color-accent);
+  }
+
+  .btn-outline {
+    @apply border-2 border-black text-black px-8 py-3 text-sm uppercase tracking-wider font-bold transition-all hover:bg-black hover:text-white cursor-pointer;
+  }
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
