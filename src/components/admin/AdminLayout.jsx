@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, ShoppingBag, Package, LogOut, Tags, Ruler, Palette, DollarSign, Ticket } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, Package, LogOut, Tags, Ruler, Palette, DollarSign, Ticket, Settings } from 'lucide-react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import logo from '../../assets/nodearTransparante.png';
 
@@ -16,6 +16,7 @@ export default function AdminLayout({ children, title, subtitle, actions }) {
     { icon: Palette, label: 'Colores', path: '/admin/colors' },
     { icon: Ticket, label: 'Cupones', path: '/admin/cupones' },
     { icon: DollarSign, label: 'Finanzas', path: '/admin/finance' },
+    { icon: Settings, label: 'Configuración', path: '/admin/configuracion' },
   ];
 
   return (

@@ -350,4 +350,22 @@ export const cuponService = {
   },
 };
 
+// Servicios de OAuth / Integraciones
+export const oauthService = {
+  async getMercadoPagoStatus() {
+    const response = await api.get('/oauth/mercadopago/status');
+    return response.data;
+  },
+
+  async getMercadoPagoAuthUrl() {
+    const response = await api.get('/oauth/mercadopago/connect');
+    return response.data;
+  },
+
+  async disconnectMercadoPago() {
+    const response = await api.delete('/oauth/mercadopago/disconnect');
+    return response.data;
+  },
+};
+
 // Servicios de Cliente - MOVIDO AL INICIO DEL ARCHIVO CON MÁS MÉTODOS

@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useCartStore } from '../../stores/useCartStore';
 import { useWishlist } from '../../hooks/useWishlist';
+import { calcularPrecioTransferencia, DESCUENTO_TRANSFERENCIA, formatARS } from '../../utils/mpFees';
 
 export default function ProductCard({ product }) {
   const navigate = useNavigate();
@@ -25,7 +26,9 @@ export default function ProductCard({ product }) {
   const imagenSecundaria = Array.isArray(imagenes) && imagenes.length > 1 ? imagenes[1] : null;
   
   // Formatear precio
-  const precio = precioBase ? `$${parseFloat(precioBase).toFixed(2)}` : '$0.00';
+  const precioNum = parseFloat(precioBase) || 0;
+  const precioTransferencia = calcularPrecioTransferencia(precioNum);
+  const cuotaNum = Math.ceil(precioNum / 3);
   
   // Obtener nombre de categoría
   const nombreCategoria = categoria?.nombre || 'Sin categoría';
@@ -149,7 +152,18 @@ export default function ProductCard({ product }) {
         <Link to={`/product/${id}`}>
           <h3 className="text-lg font-bold uppercase leading-none mb-2 group-hover:text-gray-700 transition-colors">{nombre}</h3>
         </Link>
-        <p className="text-xl font-black font-heading tracking-wide text-black">{precio}</p>
+        {/* Precio cuotas */}
+        <p className="text-base font-black font-heading tracking-wide text-black leading-tight">
+          3 cuotas de {formatARS(cuotaNum)} <span className="font-normal text-sm">sin interés</span>
+        </p>
+        {/* Precio transferencia */}
+        <p className="text-sm text-green-700 font-bold mt-0.5">
+          Transferencia{' '}
+          <span className="bg-green-600 text-white text-[10px] font-black px-1.5 py-0.5 uppercase">
+            {Math.round(DESCUENTO_TRANSFERENCIA * 100)}% OFF
+          </span>
+          {' '}{formatARS(precioTransferencia)}
+        </p>
       </div>
     </motion.div>
   );

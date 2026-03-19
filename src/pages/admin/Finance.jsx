@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, DollarSign, ShoppingCart, Users, Package, Calendar, ArrowUp, ArrowDown } from 'lucide-react';
+import { TrendingUp, DollarSign, ShoppingCart, Users, Package, Calendar, ArrowUp, ArrowDown, CreditCard, Info } from 'lucide-react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import toast from 'react-hot-toast';
 import api from '../../config/axios';
+import { calcularComisionMP, calcularRangoNetoMensual, MP_TASAS } from '../../utils/mpFees';
 
 export default function Finance() {
   const [metricas, setMetricas] = useState(null);
@@ -10,6 +11,7 @@ export default function Finance() {
   const [loading, setLoading] = useState(true);
   const [mesSeleccionado, setMesSeleccionado] = useState(new Date().getMonth() + 1);
   const [anioSeleccionado, setAnioSeleccionado] = useState(new Date().getFullYear());
+  const [simuladorMonto, setSimuladorMonto] = useState('');
 
   useEffect(() => {
     cargarDatos();
@@ -276,7 +278,7 @@ export default function Finance() {
 
       {/* Productos más vendidos */}
       {metricas?.productosDestacados && metricas.productosDestacados.length > 0 && (
-        <div className="bg-white border border-gray-200 p-6">
+        <div className="bg-white border border-gray-200 p-6 mb-8">
           <h3 className="text-xl font-black uppercase mb-6 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" /> Top Productos
           </h3>
@@ -297,6 +299,119 @@ export default function Finance() {
           </div>
         </div>
       )}
+
+      {/* ─── IMPACTO COMISIONES MERCADO PAGO ─── */}
+      <div className="bg-white border border-gray-200 p-6 mb-8">
+        <h3 className="text-xl font-black uppercase mb-1 flex items-center gap-2">
+          <CreditCard className="w-5 h-5" /> Comisiones Mercado Pago
+        </h3>
+        <p className="text-xs text-gray-400 uppercase tracking-widest mb-6">
+          Acreditación inmediata · 3 cuotas sin interés activadas
+        </p>
+
+        {/* Tasas de referencia */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <div className="border-2 border-gray-200 p-4">
+            <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-1">Contado / débito / MP</p>
+            <p className="text-3xl font-black">{MP_TASAS.contado}%</p>
+            <p className="text-xs text-gray-400 mt-1">6,29% + 21% IVA</p>
+          </div>
+          <div className="border-2 border-[#009EE3] p-4">
+            <p className="text-xs font-black uppercase tracking-widest text-[#009EE3] mb-1">3 cuotas sin interés</p>
+            <p className="text-3xl font-black">{MP_TASAS.tresCuotas}%</p>
+            <p className="text-xs text-gray-400 mt-1">(6,29% + 12,99%) + 21% IVA</p>
+          </div>
+          <div className="border-2 border-gray-200 p-4 bg-gray-50 flex flex-col justify-center">
+            <div className="flex items-start gap-2">
+              <Info className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-gray-500 leading-relaxed">
+                El costo de cuotas sin interés lo absorbés vos. Activá la opción en tu panel MP → <strong>Tu Negocio → Costos y cuotas</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Impacto en ventas del mes */}
+        {metricas?.ventasMes?.total > 0 && (() => {
+          const { optimista, pesimista } = calcularRangoNetoMensual(metricas.ventasMes.total);
+          return (
+            <div className="border border-gray-200 p-5 mb-8">
+              <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-4">
+                Estimado neto — Ventas del mes ({meses[mesSeleccionado - 1]})
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <p className="text-xs text-gray-400 uppercase mb-1">Mejor caso (todo contado)</p>
+                  <p className="text-2xl font-black text-green-600">{formatCurrency(optimista.neto)}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Comisión estimada: {formatCurrency(optimista.comisionTotal)}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-gray-400 uppercase mb-1">Peor caso (todo 3 cuotas)</p>
+                  <p className="text-2xl font-black text-orange-500">{formatCurrency(pesimista.neto)}</p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Comisión estimada: {formatCurrency(pesimista.comisionTotal)}
+                  </p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 mt-4 italic">
+                * Valores estimativos. El monto real depende del método de pago elegido por cada comprador.
+              </p>
+            </div>
+          );
+        })()}
+
+        {/* Simulador por venta */}
+        <div>
+          <p className="text-xs font-black uppercase tracking-widest text-gray-500 mb-3">Simulador por venta</p>
+          <div className="flex gap-3 items-center mb-5">
+            <span className="text-gray-500 font-bold">$</span>
+            <input
+              type="number"
+              placeholder="Ingresá el precio de venta"
+              value={simuladorMonto}
+              onChange={(e) => setSimuladorMonto(e.target.value)}
+              className="border border-gray-300 px-4 py-3 text-sm font-bold w-64 focus:outline-none focus:border-black"
+            />
+          </div>
+
+          {simuladorMonto > 0 && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-black text-white">
+                  <tr>
+                    <th className="px-4 py-3 text-left font-black uppercase text-xs tracking-wider">Escenario</th>
+                    <th className="px-4 py-3 text-right font-black uppercase text-xs tracking-wider">Precio venta</th>
+                    <th className="px-4 py-3 text-right font-black uppercase text-xs tracking-wider">Comisión MP</th>
+                    <th className="px-4 py-3 text-right font-black uppercase text-xs tracking-wider">IVA comisión</th>
+                    <th className="px-4 py-3 text-right font-black uppercase text-xs tracking-wider">Recibís</th>
+                    <th className="px-4 py-3 text-right font-black uppercase text-xs tracking-wider">Tasa efectiva</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {[
+                    { label: 'Contado / débito / MP', cuotas: 1 },
+                    { label: '3 cuotas sin interés', cuotas: 3 },
+                  ].map(({ label, cuotas }) => {
+                    const r = calcularComisionMP(parseFloat(simuladorMonto), cuotas);
+                    return (
+                      <tr key={cuotas} className="hover:bg-gray-50">
+                        <td className="px-4 py-4 font-bold">{label}</td>
+                        <td className="px-4 py-4 text-right">{formatCurrency(r.bruto)}</td>
+                        <td className="px-4 py-4 text-right text-red-500">-{formatCurrency(r.comisionSinIVA)}</td>
+                        <td className="px-4 py-4 text-right text-red-400">-{formatCurrency(r.ivaComision)}</td>
+                        <td className="px-4 py-4 text-right font-black text-green-600">{formatCurrency(r.neto)}</td>
+                        <td className="px-4 py-4 text-right text-gray-500">{(r.tasaEfectiva * 100).toFixed(2)}%</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
     </AdminLayout>
   );
 }

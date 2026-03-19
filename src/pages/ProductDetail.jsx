@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { useProduct } from '../hooks/useProducts';
 import { useCartStore } from '../stores/useCartStore';
 import { useWishlist } from '../hooks/useWishlist';
+import { calcularPrecioTransferencia, DESCUENTO_TRANSFERENCIA, formatARS } from '../utils/mpFees';
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -199,15 +200,36 @@ export default function ProductDetail() {
                 </button>
              </div>
 
-             <div className="flex items-baseline gap-4 mb-8">
-                <span className="text-3xl font-bold">${parseFloat(precio).toFixed(2)}</span>
-                {selectedVariant ? (
-                  <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wide ${selectedVariant.stock > 0 ? 'bg-accent/20 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                    {selectedVariant.stock > 0 ? `Stock: ${selectedVariant.stock}` : 'Sin Stock'}
+             <div className="mb-8">
+                {/* Precio cuotas */}
+                <div className="flex items-baseline gap-3 mb-1">
+                  <span className="text-3xl font-black">
+                    3 cuotas de {formatARS(Math.ceil(parseFloat(precio) / 3))}
                   </span>
-                ) : (
-                  <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-wide">Seleccionar variante</span>
-                )}
+                  <span className="text-base font-normal text-gray-500">sin interés</span>
+                </div>
+                {/* Precio transferencia */}
+                <div className="flex items-center gap-2">
+                  <span className="bg-green-600 text-white text-[10px] font-black px-2 py-1 uppercase tracking-wide">
+                    {Math.round(DESCUENTO_TRANSFERENCIA * 100)}% OFF
+                  </span>
+                  <span className="text-lg font-bold text-green-700">
+                    Transferencia: {formatARS(calcularPrecioTransferencia(parseFloat(precio)))}
+                  </span>
+                  <span className="text-sm text-gray-400 line-through">
+                    {formatARS(parseFloat(precio))}
+                  </span>
+                </div>
+                {/* Stock badge */}
+                <div className="mt-3">
+                  {selectedVariant ? (
+                    <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wide ${selectedVariant.stock > 0 ? 'bg-accent/20 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                      {selectedVariant.stock > 0 ? `Stock: ${selectedVariant.stock}` : 'Sin Stock'}
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-bold uppercase tracking-wide">Seleccionar variante</span>
+                  )}
+                </div>
              </div>
 
              <p className="text-gray-600 leading-relaxed mb-8 font-light">

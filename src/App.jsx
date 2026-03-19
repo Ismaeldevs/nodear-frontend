@@ -36,6 +36,8 @@ import AdminClients from './pages/admin/Clients';
 import AdminUsers from './pages/admin/Users';
 import ProductForm from './pages/admin/ProductForm';
 import OrderDetail from './pages/admin/OrderDetail';
+import Configuracion from './pages/admin/Configuracion';
+import MercadoPagoCallback from './pages/MercadoPagoCallback';
 import NotFound from './pages/NotFound';
 import Lookbook from './pages/Lookbook';
 import Maintenance from './pages/Maintenance';
@@ -191,6 +193,17 @@ function AppContent() {
                element={
                  <ProtectedRoute requiredRoles={['ADMIN', 'SUPER_ADMIN']}>
                    <AdminClients />
+                 </ProtectedRoute>
+               } 
+             />
+             {/* Callback OAuth - Mercado Pago redirige aquí */}
+             <Route path="/oauth/mercadopago/callback" element={<MercadoPagoCallback />} />
+
+             <Route 
+               path="/admin/configuracion" 
+               element={
+                 <ProtectedRoute requiredRoles={['ADMIN', 'SUPER_ADMIN']}>
+                   <Configuracion />
                  </ProtectedRoute>
                } 
              />
